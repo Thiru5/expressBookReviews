@@ -26,7 +26,7 @@ public_users.post("/register", (req,res) => {
 
 
 //Get the book list available in the shop
-public_users.get('/', async function (req, res) {\
+public_users.get('/',  function (req, res) {
     getBookList().then((data)=>{
         res.send(data)
     }).catch((err) =>{
@@ -35,15 +35,16 @@ public_users.get('/', async function (req, res) {\
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn', async function (req, res) {
+public_users.get('/isbn/:isbn', function (req, res) {
     try{
         console.log("Isbn called")
         let isbn = req.body.isbn
-        console.log(isbn)
-        res.send(JSON.stringify(books[isbn]))
+        getBookByISBN(isbn).then((data)=>{
+            res.send(data)
+        })
 
     } catch(err) {
-
+        console.log(err)
     }
  });
   
@@ -52,32 +53,23 @@ public_users.get('/author/:author',function (req, res) {
     console.log("GET Author")
     let author = req.body.author
     console.log(author)
-    let authorBookList = []
-    let i = 1
-    while(i < Object.keys(books).length){
-        console.log(books[i]["author"])
-        if (books[i]["author"] === author){
-            authorBookList.push(books[i])
-        }
-        i++
-    }
+    getBookByAuthor(author).then((data)=>{
+        res.send(data)
+    }).catch((err)=>{
+        console.log(err)
+    })
 
-    res.send(JSON.stringify(authorBookList))
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
     let title = req.body.title
-    let titleBookList = []
-    let i = 1
-    while(i < Object.keys(books).length){
-        if (books[i]['title'] === title){
-            titleBookList.push(books[i])
-        }
-        i++
-    }
-
-    res.send(JSON.stringify(titleBookList))
+    getBooksByTitle(title).then((data)=>{
+        res.send(data)
+    }).catch((err)=>{
+        console.log(err)
+    })
+    
 });
 
 //  Get book review
@@ -90,7 +82,7 @@ public_users.get('/review/:isbn',function (req, res) {
 
 
 //TASK 10 Get the book list available in the shop
-const getBookList = async (req,res) => {
+const getBookList = () => {
     
     return new Promise((resolve,reject) => {
         resolve(JSON.stringify(books))
@@ -99,56 +91,49 @@ const getBookList = async (req,res) => {
 
 //TASK 11 Get book details based on ISBN
 
-const getBookByISBN = async (req,res) =>{
-    try{
-        const data = await axios.get('/isbn/:isbn',{
-            params: {
-                isbn: req.body.isbn
-            }
-        }).then((response)=>{
-            return response.status(200).json(response.data)
-        })
+const getBookByISBN = (isbn) =>{
 
-    } catch(err) {
-        console.log(err)
-
-    }
+    return new Promise((resolve,reject) => {
+        resolve(JSON.stringify(books[isbn]))
+    })
     
 }
 
 //TASK 12
-const getBookByAuthor = async (req,res) =>{
-    try {
-        const data = await axios.get('/author/:author',{
-            params: {
-                author: req.body.author
+const getBookByAuthor =  (author) => {
+
+
+    return new Promise((resolve, reject) => {
+        let authorBookList = []
+        let i = 1
+        while(i < Object.keys(books).length){
+            console.log(books[i]["author"])
+            if (books[i]["author"] === author){
+                authorBookList.push(books[i])
             }
-        }).then((response)=>{
-            return response.status(200).json(response.data)
-        })
+            i++
+        }
 
-    } catch(err){
-
-        console.log(error)
-    }
+        resolve(JSON.stringify(authorBookList))
+    })
     
 }
 
 //TASK 13
-const getBooksByTitle = async (req,res) =>{
-    try {
-        const data = await axios.get('/title/:title',{
-            params: {
-                title: req.body.title
+const getBooksByTitle =  (title) =>{
+    
+    return new Promise((resolve,reject)=>{
+        let titleBookList = []
+        let i = 1
+        while(i < Object.keys(books).length){
+            if (books[i]['title'] === title){
+                titleBookList.push(books[i])
             }
-        }).then((response)=>{
-            return response.status(200).json(response.data)
-        })
+            i++
+        }
 
-    } catch(err){
-
-        console.log(error)
-    }
+        resolve(JSON.stringify(titleBookList))
+    })
     
 }
 
