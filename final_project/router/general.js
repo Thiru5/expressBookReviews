@@ -26,9 +26,12 @@ public_users.post("/register", (req,res) => {
 
 
 //Get the book list available in the shop
-public_users.get('/', async function (req, res) {
-    const data = await JSON.stringify(books)
-    res.send(data)
+public_users.get('/', async function (req, res) {\
+    getBookList().then((data)=>{
+        res.send(data)
+    }).catch((err) =>{
+        console.log(err)
+    })
 });
 
 // Get book details based on ISBN
@@ -88,15 +91,10 @@ public_users.get('/review/:isbn',function (req, res) {
 
 //TASK 10 Get the book list available in the shop
 const getBookList = async (req,res) => {
-
-    try{
-        const data = await axios.get('/').then((response)=>{
-            return response.status(200).json(response.data)
-        })
-    } catch(err) {
-        console.log(err)
-    }
     
+    return new Promise((resolve,reject) => {
+        resolve(JSON.stringify(books))
+    })
 }
 
 //TASK 11 Get book details based on ISBN
