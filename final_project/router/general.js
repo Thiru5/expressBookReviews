@@ -6,6 +6,7 @@ let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
 
+
 public_users.post("/register", (req,res) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -23,19 +24,11 @@ public_users.post("/register", (req,res) => {
     return res.status(404).json({message: "Unable to register user."});
 });
 
-// Get the book list available in the shop
-const getBooks = async () => {
-    try{
-        const res = await axios.get(
-            '/'
-        );
-    } catch(err) {
-        console.log("List is Empty")
-    }
-}  
 
-public_users.get('/',function (req, res) {
-    res.send(JSON.stringify(books))
+//Get the book list available in the shop
+public_users.get('/', async function (req, res) {
+    const data = await JSON.stringify(books)
+    res.send(data)
 });
 
 // Get book details based on ISBN
@@ -52,10 +45,6 @@ public_users.get('/isbn/:isbn', async function (req, res) {
  });
   
 // Get book details based on author
-
-
-
-
 public_users.get('/author/:author',function (req, res) {
     console.log("GET Author")
     let author = req.body.author
@@ -95,5 +84,75 @@ public_users.get('/review/:isbn',function (req, res) {
     res.send(JSON.stringify(books[isbn]['reviews']))
 
 });
+
+
+//TASK 10 Get the book list available in the shop
+const getBookList = async (req,res) => {
+
+    try{
+        const data = await axios.get('/').then((response)=>{
+            return response.status(200).json(response.data)
+        })
+    } catch(err) {
+        console.log(err)
+    }
+    
+}
+
+//TASK 11 Get book details based on ISBN
+
+const getBookByISBN = async (req,res) =>{
+    try{
+        const data = await axios.get('/isbn/:isbn',{
+            params: {
+                isbn: req.body.isbn
+            }
+        }).then((response)=>{
+            return response.status(200).json(response.data)
+        })
+
+    } catch(err) {
+        console.log(err)
+
+    }
+    
+}
+
+//TASK 12
+const getBookByAuthor = async (req,res) =>{
+    try {
+        const data = await axios.get('/author/:author',{
+            params: {
+                author: req.body.author
+            }
+        }).then((response)=>{
+            return response.status(200).json(response.data)
+        })
+
+    } catch(err){
+
+        console.log(error)
+    }
+    
+}
+
+//TASK 13
+const getBooksByTitle = async (req,res) =>{
+    try {
+        const data = await axios.get('/title/:title',{
+            params: {
+                title: req.body.title
+            }
+        }).then((response)=>{
+            return response.status(200).json(response.data)
+        })
+
+    } catch(err){
+
+        console.log(error)
+    }
+    
+}
+
 
 module.exports.general = public_users;
